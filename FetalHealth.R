@@ -5,17 +5,20 @@
 if(!require(tidyverse)) install.packages("tidyverse", repos = "http://cran.us.r-project.org")
 if(!require(caret)) install.packages("caret", repos = "http://cran.us.r-project.org")
 if(!require(data.table)) install.packages("data.table", repos = "http://cran.us.r-project.org")
+if(!require(gridExtra)) install.packages("data.table", repos = "http://cran.us.r-project.org")
+if(!require(rpart)) install.packages("data.table", repos = "http://cran.us.r-project.org")
+if(!require(rpart.plot)) install.packages("data.table", repos = "http://cran.us.r-project.org")
+if(!require(matrixStats)) install.packages("data.table", repos = "http://cran.us.r-project.org")
+if(!require(randomForest)) install.packages("data.table", repos = "http://cran.us.r-project.org")
 
 library(tidyverse)
-library(gridExtra)
 library(caret)
 library(data.table)
+library(gridExtra)
 library(rpart)
 library(rpart.plot)
 library(matrixStats)
-library(Rborist)
 library(randomForest)
-
 
 
 # fetal_health dataset:
@@ -29,24 +32,23 @@ data <- read.csv("fetal_health.csv")
 #---- DATA SUMMARY
 #-------------------------------------------------------------------------
 
-summary(data)
+#summary(data)
 colnames(data)
 head(data)
 
 #-------------------------------------------------------------------------
-#---- Fetal health conditon in the data set
+#---- Fetal_health column as the outcome in the data set
 #-------------------------------------------------------------------------
 
+data$fetal_health <- as.factor(data$fetal_health)
 print("number of each health condition in CTG results:")
 table(data$fetal_health)
+print("health conditions Proportions:")
 prop.table(table(data$fetal_health))
 
 #-------------------------------------------------------------------------
 #---- Data exploration plots
 #-------------------------------------------------------------------------
-
-data$fetal_health <- as.factor(data$fetal_health)
-# barplot(data$baseline.value)
 
 p1 <- data %>% ggplot(aes(fetal_health,baseline.value)) + geom_boxplot()
 p2 <- data %>% ggplot(aes(fetal_health,accelerations)) + geom_boxplot() #INSIGHT
@@ -70,14 +72,12 @@ p19 <- data %>% ggplot(aes(fetal_health,histogram_median)) + geom_boxplot() #INS
 p20 <- data %>% ggplot(aes(fetal_health,histogram_variance)) + geom_boxplot() #INSIGHT
 p21 <- data %>% ggplot(aes(fetal_health,histogram_tendency)) + geom_boxplot()
 
-grid.arrange(p1,p2,p3)
-grid.arrange(p4,p5,p6)
-grid.arrange(p7,p8,p9)
-grid.arrange(p10,p11,p12)
-grid.arrange(p13,p14,p15)
-grid.arrange(p16,p17,p18)
-grid.arrange(p19,p20,p21)
-#grid.arrange(p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14,p15,p16,p17,p18,p19,p20,p21)
+grid.arrange(p1,p2,p3,p4, ncol = 2)
+grid.arrange(p5,p6,p7,p8, ncol = 2)
+grid.arrange(p9,p10,p11,p12, ncol = 2)
+grid.arrange(p13,p14,p15,p16, ncol = 2)
+grid.arrange(p17,p18,p19,p20,p21, ncol = 2)
+# grid.arrange(p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14,p15,p16,p17,p18,p19,p20,p21)
 rm(p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14,p15,p16,p17,p18,p19,p20,p21)
 
 
@@ -104,21 +104,6 @@ rm(index)
 dim(train_set)
 dim(test_set)
 
-
-
-x <- train_set[,-22]    # 22 is the "fetal_health" column number
-y <- train_set[,22]
-
-#-------------------------------------------------------------------------
-#---- logistic regression
-#-------------------------------------------------------------------------
-
-# fit_glm <- glm(fetal_health~., data = train_set, family='binomial')
-# summary(fit_glm)
-# y_hat_glm <- factor(predict(fit_glm, test_set))
-
-
-
 #-------------------------------------------------------------------------
 #---- Knn
 #-------------------------------------------------------------------------
@@ -132,6 +117,9 @@ y <- train_set[,22]
 #                    tuneGrid = data.frame(k = c(3,5,7,9,11)),
 #                    trControl = control)
 # plot(train_knn)
+
+x <- train_set[,-22]    # 22 is the "fetal_health" column number
+y <- train_set[,22]
 
 set.seed(1, sample.kind = "Rounding")  #sample.kind=“Rounding"/"Rejection"
 control <- trainControl(method = "cv", number = 3, p = .9)
@@ -154,7 +142,7 @@ fit_tree <- rpart(fetal_health ~ ., data = train_set)
 rpart.plot(fit_tree, tweak = 1.2,
            digits = 2, box.palette = list("Greens","Blues","Reds"),
            shadow.col="gray", nn=F)
-summary(fit_tree)
+#summary(fit_tree)
 varImp(fit_tree)
 y_hat_t <- predict(fit_tree, test_set)
 # rownames(y_hat_t) <- 1:length(test_set$fetal_health)
@@ -164,7 +152,6 @@ for (i in 1:length(test_set$fetal_health)){
   y_hat_tree[i] <- which.max(y_hat_t[i,])
 }
 y_hat_tree <- factor(y_hat_tree)
-confusionMatrix(y_hat_tree,test_set$fetal_health)
 confusionMatrix(y_hat_tree,test_set$fetal_health)$overal["Accuracy"]
 
 # which(y_hat_tree != test_set$fetal_health)
@@ -183,7 +170,6 @@ imp <- importance(fit_rf)
 imp
 
 y_hat_rf <- predict(fit_rf, test_set)
-confusionMatrix(y_hat_rf,test_set$fetal_health)
 confusionMatrix(y_hat_rf,test_set$fetal_health)$overal["Accuracy"]
 
 #-------------------------------------------------------------------------
@@ -194,6 +180,13 @@ data_x <- fetalhealth[,-22]
 data_y <- fetalhealth[,22]
 
 final_rf <- randomForest(data_x, data_y, ntree = 2000)
-plot(final_rf)
 y_hat_final_rf <- predict(final_rf, validation)
 confusionMatrix(y_hat_final_rf,validation$fetal_health)$overal["Accuracy"]
+
+#-------------------------------------------------------------------------
+#---- NOTE
+#-------------------------------------------------------------------------
+
+which(y_hat_knn != test_set$fetal_health)
+which(y_hat_tree != test_set$fetal_health)
+which(y_hat_rf != test_set$fetal_health)
