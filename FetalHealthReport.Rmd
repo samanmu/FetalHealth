@@ -1,7 +1,7 @@
 ---
 title: "Choose Your Own project: 'FetalHealth'"
 author: "Saman Musician"
-date: "06/01/2021"
+date: "06/02/2021"
 output: pdf_document
 ---
 
@@ -16,8 +16,10 @@ In this project, we use a data set, Fetal Health, including 2126 CTG results to 
 In this project, we are implementing some algorithms learned in the Machine Learning course and the tools and instructions learned in Data Science program. The main goal is to comprehend the whole concept of a real project and its challenges. This project’s specific goal is to find and tune an algorithm to classify the health condition of CTG cases by the features provided with highest accuracy.
 
 ## 1.2.	Key Steps
-First of all, the websites suggested in project overview was explored and a data set which seemed to be clean and useful for this project purpose was chosen. This data set is included in the Github repository for this project and is being read by the code. The original link to the data set is as follows:
+First of all, the websites suggested in project overview was explored and a data set which seemed to be clean and useful for this project purpose was chosen. This data set is included in the Github repository for this project and is being read by the code. The original link to the data set is as follows: 
+
 https://www.kaggle.com/andrewmvd/fetal-health-classification/
+
 The next step is the preprocessing step and data wrangling. We should transform the predictors if necessary and delete the columns which will not be used as predictors. Since the data is clean, the features columns which is going to be used will be selected. In this case all columns are being used as predictors. Then, we split the data into a train set which is used to optimize algorithms and a hold-out validation set for final validation of our algorithm. The analysis step is performed on the train set. K-nearest neighbors, decision tree and random forest algorithms are trained on the train set and tested on the test set in order to achieve the highest overall accuracy for our categorical classification project. The results are then presented and the performance of the models are discussed. Finally the conclusion is made on this project.
 
 ```{r include=FALSE}
@@ -48,7 +50,7 @@ data <- read.csv("fetal_health.csv")
 In this section, I will explain the process and techniques used in order to reach our final algorithm.
 
 ## 2.1. Data Cleaning, Exploration and Visualization
-Fortunately, the data used is cleaned by the provider and is ready to be used as inputs to the desired algorithms. Here is the summary of the data:
+Fortunately, the data used is cleaned by the provider and is ready to be used as inputs to the desired algorithms. Here is the preview of the data:
 ```{r echo=TRUE}
 #summary(data)
 colnames(data)
@@ -69,27 +71,27 @@ As it is shown 78 percent of the cases are normal, 14 percent are suspect and ju
 In order to explore features, we plot each feature for different health conditions.
 
 ```{r include=FALSE}
-p1 <- data %>% ggplot(aes(fetal_health,baseline.value)) + geom_boxplot()
-p2 <- data %>% ggplot(aes(fetal_health,accelerations)) + geom_boxplot() #INSIGHT
-p3 <- data %>% ggplot(aes(fetal_health,fetal_movement)) + geom_boxplot()
-p4 <- data %>% ggplot(aes(fetal_health,uterine_contractions)) + geom_boxplot()
-p5 <- data %>% ggplot(aes(fetal_health,light_decelerations)) + geom_boxplot()
-p6 <- data %>% ggplot(aes(fetal_health,severe_decelerations)) + geom_boxplot()
-p7 <- data %>% ggplot(aes(fetal_health,prolongued_decelerations)) + geom_boxplot()
-p8 <- data %>% ggplot(aes(fetal_health,abnormal_short_term_variability)) + geom_boxplot()
-p9 <- data %>% ggplot(aes(fetal_health,mean_value_of_short_term_variability)) + geom_boxplot()
-p10 <- data %>% ggplot(aes(fetal_health,percentage_of_time_with_abnormal_long_term_variability)) + geom_boxplot()
-p11 <- data %>% ggplot(aes(fetal_health,mean_value_of_long_term_variability)) + geom_boxplot() #INSIGHT
-p12 <- data %>% ggplot(aes(fetal_health,histogram_width)) + geom_boxplot()
-p13 <- data %>% ggplot(aes(fetal_health,histogram_min)) + geom_boxplot()
-p14 <- data %>% ggplot(aes(fetal_health,histogram_max)) + geom_boxplot()
-p15 <- data %>% ggplot(aes(fetal_health,histogram_number_of_peaks)) + geom_boxplot()
-p16 <- data %>% ggplot(aes(fetal_health,histogram_number_of_zeroes)) + geom_boxplot()
-p17 <- data %>% ggplot(aes(fetal_health,histogram_mode)) + geom_boxplot()
-p18 <- data %>% ggplot(aes(fetal_health,histogram_mean)) + geom_boxplot()
-p19 <- data %>% ggplot(aes(fetal_health,histogram_median)) + geom_boxplot() #INSIGHT
-p20 <- data %>% ggplot(aes(fetal_health,histogram_variance)) + geom_boxplot() #INSIGHT
-p21 <- data %>% ggplot(aes(fetal_health,histogram_tendency)) + geom_boxplot()
+p1 <- data %>% ggplot(aes(fetal_health,baseline.value)) + geom_boxplot() + theme_bw()
+p2 <- data %>% ggplot(aes(fetal_health,accelerations)) + geom_boxplot() + theme_bw()
+p3 <- data %>% ggplot(aes(fetal_health,fetal_movement)) + geom_boxplot() + theme_bw()
+p4 <- data %>% ggplot(aes(fetal_health,uterine_contractions)) + geom_boxplot() + theme_bw()
+p5 <- data %>% ggplot(aes(fetal_health,light_decelerations)) + geom_boxplot() + theme_bw()
+p6 <- data %>% ggplot(aes(fetal_health,severe_decelerations)) + geom_boxplot() + theme_bw()
+p7 <- data %>% ggplot(aes(fetal_health,prolongued_decelerations)) + geom_boxplot() + theme_bw()
+p8 <- data %>% ggplot(aes(fetal_health,abnormal_short_term_variability)) + geom_boxplot() + theme_bw()
+p9 <- data %>% ggplot(aes(fetal_health,mean_value_of_short_term_variability)) + geom_boxplot() + theme_bw()
+p10 <- data %>% ggplot(aes(fetal_health,percentage_of_time_with_abnormal_long_term_variability)) + geom_boxplot() + theme_bw()
+p11 <- data %>% ggplot(aes(fetal_health,mean_value_of_long_term_variability)) + geom_boxplot() + theme_bw() #INSIGHT
+p12 <- data %>% ggplot(aes(fetal_health,histogram_width)) + geom_boxplot() + theme_bw()
+p13 <- data %>% ggplot(aes(fetal_health,histogram_min)) + geom_boxplot() + theme_bw()
+p14 <- data %>% ggplot(aes(fetal_health,histogram_max)) + geom_boxplot() + theme_bw()
+p15 <- data %>% ggplot(aes(fetal_health,histogram_number_of_peaks)) + geom_boxplot() + theme_bw()
+p16 <- data %>% ggplot(aes(fetal_health,histogram_number_of_zeroes)) + geom_boxplot() + theme_bw()
+p17 <- data %>% ggplot(aes(fetal_health,histogram_mode)) + geom_boxplot() + theme_bw()
+p18 <- data %>% ggplot(aes(fetal_health,histogram_mean)) + geom_boxplot() + theme_bw()
+p19 <- data %>% ggplot(aes(fetal_health,histogram_median)) + geom_boxplot() + theme_bw()
+p20 <- data %>% ggplot(aes(fetal_health,histogram_variance)) + geom_boxplot() + theme_bw()
+p21 <- data %>% ggplot(aes(fetal_health,histogram_tendency)) + geom_boxplot() + theme_bw()
 
 ```
 
@@ -135,14 +137,14 @@ dim(test_set)
 ## 3.	Modeling Approaches
 We try k-nearest neighbors, decision trees and random forest algorithms to find the best tune, and finally evaluate our optimized algorithm with the hold-out evaluation set.
 
-## 3.1.	K-Nearest Neighbors:
+## 3.1.	K-Nearest Neighbors
 For training a Knn algorithm, lots of calculations need to be done because it is needed to calculate the distance between many observations in train and test sets. Therefore, we use k-fold cross validation to improve the speed. Then we train a knn algorithm and tune the k in k-nearest neighbors. We divide the train set into a set of only predictors (x) and a set of the main label of each CTG case which is the fetal health class only (y). Then we use predict function to predict the fetal health class of the test set and calculate the accuracy of our model.
 
 ```{r echo=TRUE, warning=FALSE}
 x <- train_set[,-22]    # 22 is the "fetal_health" column number
 y <- train_set[,22]
 
-set.seed(1, sample.kind = "Rounding")  #sample.kind=“Rounding"/"Rejection"
+set.seed(1, sample.kind = "Rounding")
 control <- trainControl(method = "cv", number = 3, p = .9)
 fit_knn <- train(x,y,method = "knn",
                  tuneGrid = data.frame(k=seq(3,11,2)),
@@ -156,8 +158,8 @@ confusionMatrix(predict(fit_knn,test_set), test_set$fetal_health)$overal["Accura
 ```
 As shown, after tuning this model classifies the test set classes with 92.7% accuracy. This accuracy can still get improved
 
-## 3.2.	Decision Tree:
-We train is decision tree on the train set for classifying the fetal health of each case in the test set. Here I used “rpart.plot” package and function to plot the tree in a clear way.
+## 3.2.	Decision Tree
+We train a decision tree on the train set for classifying the fetal health of each case in the test set. Here I used “rpart.plot” package and function to plot the tree in a clear way.
 
 ```{r echo=TRUE}
 fit_tree <- rpart(fetal_health ~ ., data = train_set)
@@ -187,14 +189,14 @@ confusionMatrix(y_hat_tree,test_set$fetal_health)$overal["Accuracy"]
 It is clearly shown that 4 predictors have had no importance in training the decision tree model. They could have easily removed during data explorations.
 This algorithm is highly interpretable and easy to visualize. The accuracy is also higher than knn algorithm. However, we should note that decision trees are not flexible. It is usually better to improve the prediction performance and reduce instability by averaging multiple decision trees.
 
-## 3.3.	Random Forest:
-After using the decision tree model, it is probable that we can achieve better classification results by using a random forest model. Similar to the Knn model training, we divide the train set into a set of only predictors (x) and only outcome (y). In order to increase the accuracy we increased the ntree parameter in the randomForest function to 2000.
+## 3.3.	Random Forest
+After using the decision tree model, it is probable that we can achieve better classification results by using a random forest model. Similar to the Knn model training, we divide the train set into a set of only predictors (x) and only outcomes (y). In order to increase the accuracy we increased the ntree parameter in the randomForest function to 1000.
 
 ```{r echo=TRUE}
 x <- train_set[,-22]    # 22 is the "fetal_health" column number
 y <- train_set[,22]
 
-fit_rf <- randomForest(x, y, ntree = 2000)
+fit_rf <- randomForest(x, y, ntree = 1000)
 plot(fit_rf)
 
 imp <- importance(fit_rf)
@@ -206,21 +208,21 @@ confusionMatrix(y_hat_rf,test_set$fetal_health)$overal["Accuracy"]
 ```
 
 We have calculated variable importance on the features and realized that by averaging many decision trees the interpretability is not as much as a single decision tree algorithm.
-However, the accuracy of this model is improved significantly as anticipated. Our final model accuracy is 0.947 on the test set.
+However, the accuracy of this model is improved significantly as anticipated. Our final model accuracy is 0.953 on the test set.
 
 ## 4.	Results
-Now that we optimized our classification model to be a random forest model, we train a similar rainforest algorithm with 2000 trees using the whole “Fetalhealth” data set and test it on the “validation” set which we have held out for validating our final model.
+Now that we optimized our classification model to be a random forest model, we train a similar rainforest algorithm with 1000 trees using the whole “Fetalhealth” data set and test it on the “validation” set which we have held out for validating our final model.
 
 ```{r echo=TRUE}
 data_x <- fetalhealth[,-22]
 data_y <- fetalhealth[,22]
 
-final_rf <- randomForest(data_x, data_y, ntree = 2000)
+final_rf <- randomForest(data_x, data_y, ntree = 1000)
 y_hat_final_rf <- predict(final_rf, validation)
 confusionMatrix(y_hat_final_rf,validation$fetal_health)$overal["Accuracy"]
 ```
 
-The final accuracy on the validation set is 0.939. It is a bit lower than the accuracy we had on the test set. However, the difference in the total accuracy of this final model and our best tuned model on the train set is not significant. So there has not been much overtraining during the procedure.
+The final accuracy on the validation set is about 0.94. It is a bit lower than the accuracy we had on the test set. The difference in the total accuracy of this final model and our best tuned model on the train set is maybe due to luck or some overtraining during the procedure.
 
 ## 5.	Conclusion
 We chose a data set of 21 predictors and an outcome for each entry, being a class of 3 different levels and tried to classify the data by predictors. Some conclusions are made on this project. First, data exploration is a very important part of this data science project. It could be clearly shown that not all the columns of the data are helpful in predictions and classifications. Second, optimizing K-nearest neighbors algorithm, we can overcome the curse of dimensionality by using k-fold cross validation and improve speed. Third, a decision tree algorithm is capable of understandably visualizing the Machine Learning procedure and is very comprehensible. Using random forest algorithm can improve the accuracy of decision trees, although it lowers the interpretability.

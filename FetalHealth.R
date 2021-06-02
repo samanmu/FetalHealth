@@ -50,27 +50,27 @@ prop.table(table(data$fetal_health))
 #---- Data exploration plots
 #-------------------------------------------------------------------------
 
-p1 <- data %>% ggplot(aes(fetal_health,baseline.value)) + geom_boxplot()
-p2 <- data %>% ggplot(aes(fetal_health,accelerations)) + geom_boxplot() #INSIGHT
-p3 <- data %>% ggplot(aes(fetal_health,fetal_movement)) + geom_boxplot()
-p4 <- data %>% ggplot(aes(fetal_health,uterine_contractions)) + geom_boxplot()
-p5 <- data %>% ggplot(aes(fetal_health,light_decelerations)) + geom_boxplot()
-p6 <- data %>% ggplot(aes(fetal_health,severe_decelerations)) + geom_boxplot()
-p7 <- data %>% ggplot(aes(fetal_health,prolongued_decelerations)) + geom_boxplot()
-p8 <- data %>% ggplot(aes(fetal_health,abnormal_short_term_variability)) + geom_boxplot()
-p9 <- data %>% ggplot(aes(fetal_health,mean_value_of_short_term_variability)) + geom_boxplot()
-p10 <- data %>% ggplot(aes(fetal_health,percentage_of_time_with_abnormal_long_term_variability)) + geom_boxplot()
-p11 <- data %>% ggplot(aes(fetal_health,mean_value_of_long_term_variability)) + geom_boxplot() #INSIGHT
-p12 <- data %>% ggplot(aes(fetal_health,histogram_width)) + geom_boxplot()
-p13 <- data %>% ggplot(aes(fetal_health,histogram_min)) + geom_boxplot()
-p14 <- data %>% ggplot(aes(fetal_health,histogram_max)) + geom_boxplot()
-p15 <- data %>% ggplot(aes(fetal_health,histogram_number_of_peaks)) + geom_boxplot()
-p16 <- data %>% ggplot(aes(fetal_health,histogram_number_of_zeroes)) + geom_boxplot()
-p17 <- data %>% ggplot(aes(fetal_health,histogram_mode)) + geom_boxplot()
-p18 <- data %>% ggplot(aes(fetal_health,histogram_mean)) + geom_boxplot()
-p19 <- data %>% ggplot(aes(fetal_health,histogram_median)) + geom_boxplot() #INSIGHT
-p20 <- data %>% ggplot(aes(fetal_health,histogram_variance)) + geom_boxplot() #INSIGHT
-p21 <- data %>% ggplot(aes(fetal_health,histogram_tendency)) + geom_boxplot()
+p1 <- data %>% ggplot(aes(fetal_health,baseline.value)) + geom_boxplot() + theme_bw()
+p2 <- data %>% ggplot(aes(fetal_health,accelerations)) + geom_boxplot() + theme_bw() #INSIGHT
+p3 <- data %>% ggplot(aes(fetal_health,fetal_movement)) + geom_boxplot() + theme_bw()
+p4 <- data %>% ggplot(aes(fetal_health,uterine_contractions)) + geom_boxplot() + theme_bw()
+p5 <- data %>% ggplot(aes(fetal_health,light_decelerations)) + geom_boxplot() + theme_bw()
+p6 <- data %>% ggplot(aes(fetal_health,severe_decelerations)) + geom_boxplot() + theme_bw()
+p7 <- data %>% ggplot(aes(fetal_health,prolongued_decelerations)) + geom_boxplot() + theme_bw()
+p8 <- data %>% ggplot(aes(fetal_health,abnormal_short_term_variability)) + geom_boxplot() + theme_bw()
+p9 <- data %>% ggplot(aes(fetal_health,mean_value_of_short_term_variability)) + geom_boxplot() + theme_bw()
+p10 <- data %>% ggplot(aes(fetal_health,percentage_of_time_with_abnormal_long_term_variability)) + geom_boxplot() + theme_bw()
+p11 <- data %>% ggplot(aes(fetal_health,mean_value_of_long_term_variability)) + geom_boxplot() + theme_bw() #INSIGHT
+p12 <- data %>% ggplot(aes(fetal_health,histogram_width)) + geom_boxplot() + theme_bw()
+p13 <- data %>% ggplot(aes(fetal_health,histogram_min)) + geom_boxplot() + theme_bw()
+p14 <- data %>% ggplot(aes(fetal_health,histogram_max)) + geom_boxplot() + theme_bw()
+p15 <- data %>% ggplot(aes(fetal_health,histogram_number_of_peaks)) + geom_boxplot() + theme_bw()
+p16 <- data %>% ggplot(aes(fetal_health,histogram_number_of_zeroes)) + geom_boxplot() + theme_bw()
+p17 <- data %>% ggplot(aes(fetal_health,histogram_mode)) + geom_boxplot() + theme_bw()
+p18 <- data %>% ggplot(aes(fetal_health,histogram_mean)) + geom_boxplot() + theme_bw()
+p19 <- data %>% ggplot(aes(fetal_health,histogram_median)) + geom_boxplot() + theme_bw() #INSIGHT
+p20 <- data %>% ggplot(aes(fetal_health,histogram_variance)) + geom_boxplot() + theme_bw() #INSIGHT
+p21 <- data %>% ggplot(aes(fetal_health,histogram_tendency)) + geom_boxplot() + theme_bw()
 
 grid.arrange(p1,p2,p3,p4, ncol = 2)
 grid.arrange(p5,p6,p7,p8, ncol = 2)
@@ -108,20 +108,10 @@ dim(test_set)
 #---- Knn
 #-------------------------------------------------------------------------
 
-# n <- 600
-# b <- 2
-# index <- sample(nrow(x), n)
-# control <- trainControl(method = "cv", number = b, p = .9)
-# train_knn <- train(x[index,], y[index],
-#                    method = "knn",
-#                    tuneGrid = data.frame(k = c(3,5,7,9,11)),
-#                    trControl = control)
-# plot(train_knn)
-
 x <- train_set[,-22]    # 22 is the "fetal_health" column number
 y <- train_set[,22]
 
-set.seed(1, sample.kind = "Rounding")  #sample.kind=“Rounding"/"Rejection"
+set.seed(1, sample.kind = "Rounding")
 control <- trainControl(method = "cv", number = 3, p = .9)
 fit_knn <- train(x,y,method = "knn",
                  tuneGrid = data.frame(k=seq(3,11,2)),
@@ -163,7 +153,7 @@ confusionMatrix(y_hat_tree,test_set$fetal_health)$overal["Accuracy"]
 x <- train_set[,-22]    # 22 is the "fetal_health" column number
 y <- train_set[,22]
 
-fit_rf <- randomForest(x, y, ntree = 2000)
+fit_rf <- randomForest(x, y, ntree = 1000)
 plot(fit_rf)
 
 imp <- importance(fit_rf)
@@ -179,7 +169,7 @@ confusionMatrix(y_hat_rf,test_set$fetal_health)$overal["Accuracy"]
 data_x <- fetalhealth[,-22]
 data_y <- fetalhealth[,22]
 
-final_rf <- randomForest(data_x, data_y, ntree = 2000)
+final_rf <- randomForest(data_x, data_y, ntree = 1000)
 y_hat_final_rf <- predict(final_rf, validation)
 confusionMatrix(y_hat_final_rf,validation$fetal_health)$overal["Accuracy"]
 
